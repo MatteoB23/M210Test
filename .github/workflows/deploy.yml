@@ -24,12 +24,12 @@ jobs:
           name: site
           path: .
 
-      - name: Deploy to Server
+            - name: Deploy to Server
         env:
           SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           # SSH Key speichern
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > private_key.pem
+          printf "%s" "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
           chmod 600 private_key.pem
           
           # Git-Pull direkt auf dem Server ausführen
@@ -37,8 +37,8 @@ jobs:
             cd /var/www/html
             git reset --hard  # Falls es Änderungen gibt
             git pull origin main
-            sudo chmod -R 777 /var/www/html  # Rechte setzen
+            sudo chmod -R 755 /var/www/html  # Rechte setzen
           EOF
           
           # SSH Key löschen
-          rm private_key.pem
+          rm -f private_key.pem
