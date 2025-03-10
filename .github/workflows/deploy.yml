@@ -7,31 +7,37 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  
-
+    runs-on: httpd:latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Deploy to Server via SSH
+      - name: Upload Website Files
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: .  # Das gesamte Repository hochladen
+
+      - name: Download Website Files
+        uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: .
+
+      - name: Deploy to Server
         env:
           SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SERVER_IP: "ec2-3-84-213-37.compute-1.amazonaws.com"
-          SERVER_USER: "ubuntu"
         run: |
-          # SSH Key speichern (mit korrektem Format)
-          echo -e "$SSH_KEY" | tr -d '\r' > private_key.pem
+          # SSH Key speichern
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > private_key.pem
           chmod 600 private_key.pem
           
-          # Teste die SSH-Verbindung
-          ssh -i private_key.pem -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "echo 'SSH Verbindung erfolgreich!'"
-
           # Git-Pull direkt auf dem Server ausführen
-          ssh -i private_key.pem -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP << 'EOF'
+          ssh -i private_key.pem -o StrictHostKeyChecking=no ubuntu@ec2-3-84-213-37.compute-1.amazonaws.com << 'EOF'
             cd /var/www/html
-            git reset --hard
-            git pull origin main --force
-            sudo chown -R www-data:www-data /var/www/html  # Rechte setzen
+            git reset --hard  # Falls es Änderungen gibt
+            git pull origin main
+            sudo chmod -R 777 /var/www/html  # Rechte setzen
           EOF
           
           # SSH Key löschen
