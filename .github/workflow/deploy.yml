@@ -36,7 +36,7 @@ jobs:
           ssh -i private_key.pem -o StrictHostKeyChecking=no ubuntu@ec2-3-84-213-37.compute-1.amazonaws.com << 'EOF'
             cd /var/www/html
             git reset --hard  # Falls es Änderungen gibt
-            git pull origin main
+            git pull origin main --force
             sudo chmod -R 777 /var/www/html  # Rechte setzen
           EOF
           
