@@ -29,7 +29,7 @@ jobs:
           SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           # SSH Key speichern
-          printf "%s" "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > private_key.pem
           chmod 600 private_key.pem
           
           # Git-Pull direkt auf dem Server ausführen
@@ -37,8 +37,8 @@ jobs:
             cd ~/M210Test/
             git reset --hard  # Falls es Änderungen gibt
             git pull origin main
-            sudo chmod -R 755 ~/M210Test/  # Rechte setzen
+            sudo chmod -R 777 ~/M210Test/  # Rechte setzen
           EOF
           
           # SSH Key löschen
-          rm -f private_key.pem
+          rm private_key.pem
