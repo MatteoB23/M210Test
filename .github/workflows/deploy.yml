@@ -24,7 +24,7 @@ jobs:
           name: site
           path: .
 
-            - name: Deploy to Server
+      - name: Deploy to Server
         env:
           SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
